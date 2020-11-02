@@ -8,25 +8,75 @@ void ofApp::setup(){
     dir.listDir(base_path);
     
     // Iterate through each file in the directory
-    for (int i = 0; i < 1; i++) {
-        cout << dir.getPath(i) << endl;
+    for (int i = 0; i < dir.size(); i++) {
+        
+        // Load image and add the color of every pixel to the color counts
+        cur_img.load(dir.getPath(i));
+        count_image_colors(cur_img);
     }
+    
+    get_top_n_colors(1024);
         
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-
+    cur_img.draw(0,0);
 }
 
 //--------------------------------------------------------------
-void ofApp::calc_top_n_colors(){
+void ofApp::get_top_n_colors(int n){
+    
 
+    // Make a copy of color_counts
+    for (int a = 0; a < c_arr_len; a++) {
+        color_counts_temp[a] = color_counts[a];
+    }
+    
+    // NOTE: VERY INEFFICIENT - Improve if time permits
+    for (int l = 0; l < n; l++) {
+        int largest_val = 0;
+        int largest_index = 0;
+        for (int i = 0; i < c_arr_len; i++) {
+            if(color_counts_temp[i] > largest_val) {
+                largest_val = color_counts_temp[i];
+                largest_index = i;
+            }
+        }
+        
+        // Remove this value from the temp array
+        color_counts_temp[largest_index] = 0;
+        top_color_indices.push_back(largest_index);
+    }
+    
+}
+
+//--------------------------------------------------------------
+void ofApp::count_image_colors(ofImage img){
+    
+    // Loop through each pixel and add to the array of color counts
+    for (int i = 0; i < img.getWidth(); i++) {
+        for (int j = 0; j < img.getHeight(); j++) {
+            
+            // Get pixel color value
+            ofColor cur_color = img.getColor(i,j);
+            
+            // Convert from color to bucketed color
+            ofVec3f bucket_color = color_to_bucket(cur_color);
+            
+            // Get the correct array index
+            int arr_index = bucket_to_array_index(bucket_color);
+            
+            // Add a count to the array
+            color_counts[arr_index] += 1;
+            
+        }
+    }
 }
 
 //--------------------------------------------------------------
