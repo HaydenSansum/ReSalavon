@@ -8,8 +8,11 @@ void ofApp::setup(){
     draw_sq = 1; // 1 to draw squares else 0 to draw vertical lines
     
     // Base path to images
-    base_path = "scotland_2019";
+    base_path = "japan_2020";
     dir.listDir(base_path);
+    
+    // Allocate FBO
+    fbo.allocate(2048, 2048, GL_RGBA);
     
     // Iterate through each file in the directory
     for (int i = 0; i < dir.size(); i++) {
@@ -36,6 +39,8 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     
+    fbo.begin();
+    
     if (draw_sq == 0) {
         // Draw vertical lines
         draw_vertical_lines(saturation_order);
@@ -43,6 +48,9 @@ void ofApp::draw(){
         // Draw squares
         draw_squares(saturation_order);
     }
+    
+    fbo.end();
+    fbo.draw(0,0);
 
 }
 
@@ -228,7 +236,7 @@ void ofApp::draw_vertical_lines(int saturation_order){
         ofSetColor(actual_color);
         
         // Draw vertical lines
-        ofDrawRectangle(i, 0, 1, ofGetHeight());
+        ofDrawRectangle(i, 0, 1, fbo.getHeight());
     }
 }
 
@@ -250,8 +258,8 @@ void ofApp::draw_squares(int saturation_order) {
         // Set color
         ofSetColor(actual_color);
         
-        // Draw vertical lines
-        ofDrawRectangle(i, i, ofGetWidth()-i, ofGetHeight()-i);
+        // Draw squares lines
+        ofDrawRectangle(i, i, fbo.getWidth()-2*i, fbo.getHeight()-2*i);
     }
 }
 
@@ -260,8 +268,12 @@ void ofApp::draw_squares(int saturation_order) {
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     if (key == ' ') {
-        save_img.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
-        save_img.save(ofGetTimestampString() + "screenshot.png");
+//        save_img.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
+//        save_img.save(ofGetTimestampString() + "screenshot.png");
+//
+        ofPixels p;
+        fbo.readToPixels(p);
+        ofSaveImage(p, ofGetTimestampString() + ".png");
     }
 }
 

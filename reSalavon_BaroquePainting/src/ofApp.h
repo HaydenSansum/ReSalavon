@@ -53,10 +53,12 @@ class ofApp : public ofBaseApp{
     // Images
     ofImage cur_img;
     ofImage save_img;
+    ofFbo fbo;
     
     // Other variables
     int saturation_order;
     int draw_sq;
+    
 
 		
 };
