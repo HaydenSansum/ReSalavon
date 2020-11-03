@@ -3,8 +3,11 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
+    // Variables
+    saturation_order = 1; // 1 to draw in saturation ordered else 0
+    
     // Base path to images
-    base_path = "london_2018";
+    base_path = "scotland_2019";
     dir.listDir(base_path);
     
     // Iterate through each file in the directory
@@ -16,6 +19,11 @@ void ofApp::setup(){
     }
     
     get_top_n_colors(1024);
+    
+    
+    // SATURATION ORDERING
+    create_saturation_order();
+    
         
 }
 
@@ -26,9 +34,18 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    cur_img.draw(0,0);
+    
+    // Draw vertical lines
+    draw_vertical_lines(saturation_order);
+    
+    // Draw squares
+    
+    
 }
 
+
+
+//--------------------HELPER FUNCTIONS--------------------------
 //--------------------------------------------------------------
 void ofApp::get_top_n_colors(int n){
     
@@ -38,7 +55,7 @@ void ofApp::get_top_n_colors(int n){
         color_counts_temp[a] = color_counts[a];
     }
     
-    // NOTE: VERY INEFFICIENT - Improve if time permits
+    // NOTE: INEFFICIENT - Improve if time permits (negligible compared to image step)
     for (int l = 0; l < n; l++) {
         int largest_val = 0;
         int largest_index = 0;
@@ -51,7 +68,7 @@ void ofApp::get_top_n_colors(int n){
         
         // Remove this value from the temp array
         color_counts_temp[largest_index] = 0;
-        top_color_indices.push_back(largest_index);
+        top_color_indices[l] = (largest_index);
     }
     
 }
@@ -151,8 +168,78 @@ ofColor ofApp::bucket_to_color(ofVec3f bucket){
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key){
+void ofApp::create_saturation_order(){
+    
+    // Create copy
+    for (int a = 0; a < num_colors; a++) {
+        top_color_indices_temp[a] = top_color_indices[a];
+    }
+    
+    // Order max to min
+    for (int i = 0; i < num_colors; i++) {
+        
+        int max_s = 0;
+        int max_index = 0;
+        int color_int = 0;
+        
+        for (int j = 0; j < num_colors; j++) {
+            
+            ofVec3f cur_bucket = array_index_to_bucket(top_color_indices_temp[j]);
+            ofColor cur_color = bucket_to_color(cur_bucket);
+            
+            float h = 0;
+            float s = 0;
+            float b = 0;
+            cur_color.getHsb(h, s, b);
+            
+            if(s > max_s) {
+                max_s = s;
+                max_index = j;
+            }
+        }
+        
+        saturation_ordered_indices[i] = top_color_indices_temp[max_index];
+        top_color_indices_temp[max_index] = 0;
+    }
+    
+}
 
+
+//-------------------DRAWING FUNCTIONS--------------------------
+//--------------------------------------------------------------
+void ofApp::draw_vertical_lines(int saturation_order){
+    // Draw vertical lines
+    for (int i = 0; i < num_colors; i++) {
+        
+        ofVec3f bucket_color;
+        
+        // Get color from index
+        if(saturation_order == 0) {
+            bucket_color = array_index_to_bucket(top_color_indices[i]);
+        } else {
+            bucket_color = array_index_to_bucket(saturation_ordered_indices[i]);
+        }
+        ofColor actual_color = bucket_to_color(bucket_color);
+        
+        // Set color
+        ofSetColor(actual_color);
+        
+        // Draw vertical lines
+        ofDrawRectangle(i, 0, 1, ofGetHeight());
+    }
+}
+
+
+
+
+
+//------------------BUILT IN FUNCTIONS--------------------------
+//--------------------------------------------------------------
+void ofApp::keyPressed(int key){
+    if (key == ' ') {
+        save_img.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
+        save_img.save(ofGetTimestampString() + "screenshot.png");
+    }
 }
 
 //--------------------------------------------------------------

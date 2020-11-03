@@ -15,6 +15,9 @@ class ofApp : public ofBaseApp{
         int bucket_to_array_index(ofVec3f bucket);
         ofVec3f color_to_bucket(ofColor color);
         ofColor bucket_to_color(ofVec3f bucket);
+        void create_saturation_order();
+    
+        void draw_vertical_lines(int saturation_order);
 
 		void keyPressed(int key);
 		void keyReleased(int key);
@@ -34,10 +37,13 @@ class ofApp : public ofBaseApp{
     int color_counts [132651] = {0}; // Must be: floor(256 / color_resolution) ^ 3
     int color_counts_temp [132651] = {0};
     int c_arr_len = 132651;
+    int num_colors = 1024; // MUST MATCH BELOW
     
     
     // Backend Colors
-    vector <int> top_color_indices;
+    int top_color_indices[1024] = {0};
+    int top_color_indices_temp[1024] = {0};
+    int saturation_ordered_indices[1024] = {0};
     
     // File paths
     string base_path;
@@ -45,7 +51,10 @@ class ofApp : public ofBaseApp{
     
     // Images
     ofImage cur_img;
-    ofImage img_grab;
+    ofImage save_img;
+    
+    // Other variables
+    int saturation_order;
 
 		
 };
