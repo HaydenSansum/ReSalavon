@@ -18,6 +18,7 @@ class ofApp : public ofBaseApp{
         void create_saturation_order();
     
         void draw_vertical_lines(int saturation_order);
+        void draw_squares(int saturation_order);
 
 		void keyPressed(int key);
 		void keyReleased(int key);
@@ -55,6 +56,7 @@ class ofApp : public ofBaseApp{
     
     // Other variables
     int saturation_order;
+    int draw_sq;
 
 		
 };

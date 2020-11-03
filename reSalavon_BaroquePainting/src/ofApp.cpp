@@ -5,6 +5,7 @@ void ofApp::setup(){
 
     // Variables
     saturation_order = 1; // 1 to draw in saturation ordered else 0
+    draw_sq = 1; // 1 to draw squares else 0 to draw vertical lines
     
     // Base path to images
     base_path = "scotland_2019";
@@ -35,12 +36,14 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     
-    // Draw vertical lines
-    draw_vertical_lines(saturation_order);
-    
-    // Draw squares
-    
-    
+    if (draw_sq == 0) {
+        // Draw vertical lines
+        draw_vertical_lines(saturation_order);
+    } else {
+        // Draw squares
+        draw_squares(saturation_order);
+    }
+
 }
 
 
@@ -229,8 +232,28 @@ void ofApp::draw_vertical_lines(int saturation_order){
     }
 }
 
-
-
+//--------------------------------------------------------------
+void ofApp::draw_squares(int saturation_order) {
+    // Draw squares
+    for (int i = 0; i < num_colors; i++) {
+        
+        ofVec3f bucket_color;
+        
+        // Get color from index
+        if(saturation_order == 0) {
+            bucket_color = array_index_to_bucket(top_color_indices[i]);
+        } else {
+            bucket_color = array_index_to_bucket(saturation_ordered_indices[i]);
+        }
+        ofColor actual_color = bucket_to_color(bucket_color);
+        
+        // Set color
+        ofSetColor(actual_color);
+        
+        // Draw vertical lines
+        ofDrawRectangle(i, i, ofGetWidth()-i, ofGetHeight()-i);
+    }
+}
 
 
 //------------------BUILT IN FUNCTIONS--------------------------
